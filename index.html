@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skyline — Weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div class="bg-layer" id="bgLayer"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="app">
+
+    <!-- ── HEADER ── -->
+    <header class="header">
+      <div class="logo">☁ SKYLINE</div>
+      <div class="header-right">
+        <!-- °C / °F Toggle -->
+        <div class="unit-toggle">
+          <button class="unit-btn active" id="btnC">°C</button>
+          <span class="unit-sep">|</span>
+          <button class="unit-btn" id="btnF">°F</button>
+        </div>
+        <!-- Dark / Light mode -->
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      </div>
+    </header>
+
+    <!-- ── SEARCH ── -->
+    <section class="search-section">
+      <div class="search-wrap" id="searchWrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Search city…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="clear-btn" id="clearBtn" title="Clear">✕</button>
+        <button id="searchBtn">Search</button>
+        <!-- Autocomplete dropdown -->
+        <div class="ac-dropdown" id="acDropdown"></div>
+      </div>
+      <p class="error-msg" id="errorMsg"></p>
+
+      <!-- Recent searches chips -->
+      <div class="recents" id="recents"></div>
+    </section>
+
+    <!-- ── LOADER ── -->
+    <div class="loader" id="loader">
+      <div class="loader-ring"></div>
+      <span>Reading the skies…</span>
+    </div>
+
+    <!-- ── MAIN WEATHER CARD ── -->
+    <section class="weather-card" id="weatherCard">
+
+      <!-- City + time row -->
+      <div class="card-header">
+        <div class="card-location">
+          <h2 class="city-name" id="cityName">—</h2>
+          <p class="city-meta" id="cityMeta">—</p>
+        </div>
+        <div class="card-header-right">
+          <div class="local-time" id="localTime">—</div>
+          <!-- Share button -->
+          <button class="share-btn" id="shareBtn" title="Share weather">↗</button>
+        </div>
+      </div>
+
+      <!-- Temp + icon + condition -->
+      <div class="card-main">
+        <div class="temp-block">
+          <span class="temp-value" id="tempValue">—</span>
+          <span class="temp-unit" id="tempUnit">°C</span>
+        </div>
+        <div class="weather-icon-wrap">
+          <img class="weather-icon" id="weatherIcon" src="" alt=""/>
+          <p class="condition-text" id="conditionText">—</p>
+          <p class="temp-range" id="tempRange">—</p>
+        </div>
+      </div>
+
+      <!-- Primary stats row -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">💧</span>
+          <span class="stat-value" id="humidity">—</span>
+          <span class="stat-label">Humidity</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💨</span>
+          <span class="stat-value" id="windSpeed">—</span>
+          <span class="stat-label">Wind</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌡️</span>
+          <span class="stat-value" id="feelsLike">—</span>
+          <span class="stat-label">Feels like</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">👁️</span>
+          <span class="stat-value" id="visibility">—</span>
+          <span class="stat-label">Visibility</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌅</span>
+          <span class="stat-value" id="sunrise">—</span>
+          <span class="stat-label">Sunrise</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌇</span>
+          <span class="stat-value" id="sunset">—</span>
+          <span class="stat-label">Sunset</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🔵</span>
+          <span class="stat-value" id="pressure">—</span>
+          <span class="stat-label">Pressure</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">☁️</span>
+          <span class="stat-value" id="cloudiness">—</span>
+          <span class="stat-label">Cloud cover</span>
+        </div>
+      </div>
+
+      <!-- AQI Bar -->
+      <div class="aqi-block" id="aqiBlock" style="display:none">
+        <div class="aqi-label-row">
+          <span class="aqi-title">Air Quality Index</span>
+          <span class="aqi-value-text" id="aqiText">—</span>
+        </div>
+        <div class="aqi-bar-track">
+          <div class="aqi-bar-fill" id="aqiBar"></div>
+        </div>
+        <div class="aqi-scale">
+          <span>Good</span><span>Fair</span><span>Moderate</span><span>Poor</span><span>Very Poor</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── 5-DAY FORECAST ── -->
+    <section class="forecast-section" id="forecastSection" style="display:none">
+      <div class="section-label">5-Day Forecast</div>
+      <div class="forecast-grid" id="forecastGrid"></div>
+    </section>
+
+    <!-- ── HOURLY FORECAST ── -->
+    <section class="hourly-section" id="hourlySection" style="display:none">
+      <div class="section-label">Hourly</div>
+      <div class="hourly-scroll" id="hourlyScroll"></div>
+    </section>
+
+  </div>
+
+  <!-- Share Toast -->
+  <div class="toast" id="toast">Link copied to clipboard!</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
